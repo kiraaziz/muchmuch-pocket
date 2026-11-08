@@ -1,19 +1,34 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from '@tailwindcss/vite'
-// @ts-expect-error type error without @types/node package
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import process from "node:process";
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(() => ({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
+    react(), tailwindcss()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent Vite from obscuring rust errors
   clearScreen: false,
   // 2. tauri expects a fixed port, fail if that port is not available
+  resolve: {
+    alias: {
+      "@": path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "./src"
+      ),
+    },
+  },
   server: {
     port: 1420,
     strictPort: true,

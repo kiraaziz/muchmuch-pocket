@@ -1,10 +1,31 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./styles/globals.css"
+// src/main.tsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+// Import the route tree generated automatically by the Vite plugin
+import { routeTree } from './routeTree.gen'
+
+// Create a new router instance
+const router = createRouter({ routeTree })
+
+// Register the router instance for type safety across your app
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+
+// Render the app
+const rootElement = document.getElementById('root')!
+if (!rootElement.innerHTML) {
+  const root = createRoot(rootElement)
+  root.render(
+    <StrictMode>
+      <RouterProvider router={router} />
+      {/* Optional: DevTools panel for debugging routes */}
+      {/* <TanStackRouterDevtools router={router} /> */}
+    </StrictMode>,
+  )
+}
